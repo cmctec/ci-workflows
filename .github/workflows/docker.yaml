@@ -15,6 +15,8 @@ jobs:
             "https://$GITHUB_ACTOR:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY.git" \
             "$GITHUB_REF:$GITHUB_REF"
           git -C "$repo_dir" checkout --detach --quiet "$GITHUB_REF"
+
+          /opt/github-runner/docker-login.sh
           
           if [ "$GITHUB_REF_TYPE" = branch ] && echo "$GITHUB_REF_NAME" | grep -q "^[0-9]\+\.[0-9]\+\.x$"
           then
@@ -25,7 +27,6 @@ jobs:
             docker build --pull --tag="$image1" --tag="$image2" "$repo_dir"
           
             /opt/github-runner/create-repository.sh "$GITHUB_REPOSITORY"
-            /opt/github-runner/docker-login.sh
           
             docker push "$image1"
             docker push "$image2"
@@ -38,7 +39,6 @@ jobs:
             image="$my_registry/$GITHUB_REPOSITORY:$GITHUB_REF_NAME"
             
             /opt/github-runner/create-repository.sh "$GITHUB_REPOSITORY"
-            /opt/github-runner/docker-login.sh
           
             docker build --cache-from="$cache_image" --tag="$image" "$repo_dir"
           
