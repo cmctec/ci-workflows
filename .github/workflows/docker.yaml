@@ -18,12 +18,12 @@ jobs:
           
           if [ "$GITHUB_REF_TYPE" = branch ] && echo "$GITHUB_REF_NAME" | grep -q "^\(dev\|main\|test\)$"
           then
-            image="registry.cmctech.com/$GITHUB_REPOSITORY:$GITHUB_REF_NAME"
+            image="registry.cmctech.pro/$GITHUB_REPOSITORY:$GITHUB_REF_NAME"
             docker build --compress --pull --tag="$image" "$repo_dir"
             docker push "$image"
           elif [ "$GITHUB_REF_TYPE" = branch ] && echo "$GITHUB_REF_NAME" | grep -q "^[0-9]\+\.[0-9]\+\.x$"
           then
-            image="registry.cmctech.com/$GITHUB_REPOSITORY:$GITHUB_REF_NAME"
+            image="registry.cmctech.pro/$GITHUB_REPOSITORY:$GITHUB_REF_NAME"
             if docker pull "$image"
             then
               docker build --compress --cache-from="$image" --tag="$image" "$repo_dir"
@@ -34,8 +34,8 @@ jobs:
           elif [ "$GITHUB_REF_TYPE" = tag ] && echo "$GITHUB_REF_NAME" | grep -q "^[0-9]\+\.[0-9]\+\.[0-9]\+$"
           then
             cache_tag=$(echo "$GITHUB_REF_NAME" | sed 's/^\([0-9]\+\.[0-9]\+\)\.[0-9]\+$/\1.x/')
-            cache_image="registry.cmctech.com/$GITHUB_REPOSITORY:$cache_tag"
-            image="registry.cmctech.com/$GITHUB_REPOSITORY:$GITHUB_REF_NAME"
+            cache_image="registry.cmctech.pro/$GITHUB_REPOSITORY:$cache_tag"
+            image="registry.cmctech.pro/$GITHUB_REPOSITORY:$GITHUB_REF_NAME"
             if docker pull "$cache_image"
             then
               docker build --compress --cache-from="$cache_image" --tag="$image" "$repo_dir"
