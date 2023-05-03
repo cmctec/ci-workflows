@@ -41,7 +41,7 @@ jobs:
               docker build --compress --tag="$image" "$repo_dir"
             fi
             docker push "$image"
-          elif [ "$GITHUB_REF_TYPE" = tag ] && echo "$GITHUB_REF_NAME" | grep -q "^[0-9]\+\.[0-9]\+\.[0-9]\+$"
+          elif [ "$GITHUB_REF_TYPE" = tag ] && echo "$GITHUB_REF_NAME" | grep -q "^[0-9]\+\.[0-9]\+\.[0-9]\+\(-[a-z]\+\)\?$"
           then
             cache_tag=$(echo "$GITHUB_REF_NAME" | sed 's/^\([0-9]\+\.[0-9]\+\)\.[0-9]\+$/\1.x/')
             cache_image="registry.cmctech.pro/$GITHUB_REPOSITORY:$cache_tag"
