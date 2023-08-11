@@ -13,25 +13,25 @@ jobs:
     steps:
       - name: build
         run: |
-          echo build $GITHUB_REPOSITORY $GITHUB_REF_TYPE $GITHUB_REF_NAME
-          
-          repo_dir="repo_$(printf %s "$GITHUB_REPOSITORY" | tr -c A-Za-z0-9_- _)"
+          echo "build $GITHUB_REPOSITORY $GITHUB_REF_TYPE $GITHUB_REF_NAME"
+
+          repo_dir="repo_$(printf '%s' "$GITHUB_REPOSITORY" | tr -c 'A-Za-z0-9_-' '_')"
           [ -e "$repo_dir" ] && [ ! -d "$repo_dir/.git" ] && rm -rf "$repo_dir"
           [ ! -e "$repo_dir" ] && git init --quiet "$repo_dir"
           git -C "$repo_dir" fetch --depth=1 --force --quiet \
             "https://$GITHUB_ACTOR:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY.git" \
             "$GITHUB_REF:$GITHUB_REF"
           git -C "$repo_dir" checkout --detach --quiet "$GITHUB_REF"
-          
-          if [ "$GITHUB_REF_TYPE" = branch ] && echo "$GITHUB_REF_NAME" | grep -q "^\(dev\|main\|test\)$"
+
+          if [ "$GITHUB_REF_TYPE" = 'branch' ] && echo "$GITHUB_REF_NAME" | grep -q '^\(dev\|main\|test\)$'
           then
             image="registry.cmctech.pro/$GITHUB_REPOSITORY:$GITHUB_REF_NAME"
             docker build --compress --pull --tag="$image" "$repo_dir"
             docker push "$image"
-          elif [ "$GITHUB_REF_TYPE" = branch ] && echo "$GITHUB_REF_NAME" | grep -q "^[0-9]\+\.[0-9]\+\.x$"
+          elif [ "$GITHUB_REF_TYPE" = 'branch' ] && echo "$GITHUB_REF_NAME" | grep -q '^[0-9]\+\.[0-9]\+\.x$'
           then
             image="registry.cmctech.pro/$GITHUB_REPOSITORY:$GITHUB_REF_NAME"
-            if [ "${{ inputs.cache }}" != true ]
+            if [ "${{ inputs.cache }}" != 'true' ]
             then
               docker build --compress --pull --tag="$image" "$repo_dir"
             elif docker pull "$image"
@@ -41,12 +41,12 @@ jobs:
               docker build --compress --tag="$image" "$repo_dir"
             fi
             docker push "$image"
-          elif [ "$GITHUB_REF_TYPE" = tag ] && echo "$GITHUB_REF_NAME" | grep -q "^[0-9]\+\.[0-9]\+\.[0-9]\+\(-[a-z]\+\)\?$"
+          elif [ "$GITHUB_REF_TYPE" = 'tag' ] && echo "$GITHUB_REF_NAME" | grep -q '^[0-9]\+\.[0-9]\+\.[0-9]\+\(-[a-z]\+\)\?$'
           then
             cache_tag=$(echo "$GITHUB_REF_NAME" | sed 's/^\([0-9]\+\.[0-9]\+\)\.[0-9]\+$/\1.x/')
             cache_image="registry.cmctech.pro/$GITHUB_REPOSITORY:$cache_tag"
             image="registry.cmctech.pro/$GITHUB_REPOSITORY:$GITHUB_REF_NAME"
-            if [ "${{ inputs.cache }}" != true ]
+            if [ "${{ inputs.cache }}" != 'true' ]
             then
               docker build --compress --pull --tag="$image" "$repo_dir"
             elif docker pull "$cache_image"
@@ -57,7 +57,7 @@ jobs:
             fi
             docker push "$image"
           else
-            if [ "${{ inputs.cache }}" != true ]
+            if [ "${{ inputs.cache }}" != 'true' ]
             then
               docker build --compress --pull "$repo_dir"
             else
