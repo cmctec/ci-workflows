@@ -59,7 +59,12 @@ jobs:
           elif [ "$GITHUB_REF_TYPE" = 'tag' ] && echo "$GITHUB_REF_NAME" | grep -q '^test-[0-9a-f]\{7\}$'
           then
             image="registry.cmctech.pro/$GITHUB_REPOSITORY:$GITHUB_REF_NAME"
-            docker build --compress --pull --tag="$image" "$repo_dir"
+            if [ "${{ inputs.cache }}" != 'true' ]
+            then
+              docker build --compress --pull --tag="$image" "$repo_dir"
+            else
+              docker build --compress --tag="$image" "$repo_dir"
+            fi
             docker push "$image"
           else
             if [ "${{ inputs.cache }}" != 'true' ]
