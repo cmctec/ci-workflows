@@ -2,12 +2,12 @@ name: Docker
 on:
   workflow_call:
     inputs:
-      build_args:
+      "build_args":
         description: "Space-separated environment variables to pass to docker build"
         type: string
         default: ""
         required: false
-      cache:
+      "cache":
         description: "Use previous builds as a cache"
         type: boolean
         default: true
