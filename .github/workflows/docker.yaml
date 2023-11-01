@@ -37,6 +37,7 @@ jobs:
           done
           echo "inputs.build_args = ${{inputs.build_args}}"
           echo "build_args = ${build_args}"
+          echo "some_var = ${some_var}"
 
           if [ "${GITHUB_REF_TYPE}" = 'branch' ] && echo "${GITHUB_REF_NAME}" | grep -q '^\(dev\|main\|test\)$'; then
             image="registry.cmctech.pro/${GITHUB_REPOSITORY}:${GITHUB_REF_NAME}"
