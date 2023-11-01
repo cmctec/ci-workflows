@@ -2,6 +2,12 @@ name: Docker
 on:
   workflow_call:
     inputs:
+      "build_args":
+        description: "Space-separated environment variables to pass to docker build"
+        type: string
+        default: ""
+        required: false
+
       "cache":
         description: "Use previous builds as a cache"
         type: boolean
@@ -29,16 +35,16 @@ jobs:
 
           if [ "${GITHUB_REF_TYPE}" = 'branch' ] && echo "${GITHUB_REF_NAME}" | grep -q '^\(dev\|main\|test\)$'; then
             image="registry.cmctech.pro/${GITHUB_REPOSITORY}:${GITHUB_REF_NAME}"
-            docker build --compress --pull --tag="${image}" "${repo_dir}"
+            docker build ${{inputs.build_args}} --compress --pull --tag="${image}" "${repo_dir}"
             docker push "${image}"
           elif [ "${GITHUB_REF_TYPE}" = 'branch' ] && echo "${GITHUB_REF_NAME}" | grep -q '^[0-9]\+\.[0-9]\+\.x$'; then
             image="registry.cmctech.pro/${GITHUB_REPOSITORY}:${GITHUB_REF_NAME}"
             if [ "${{inputs.cache}}" != 'true' ]; then
-              docker build --compress --pull --tag="${image}" "${repo_dir}"
+              docker build ${{inputs.build_args}} --compress --pull --tag="${image}" "${repo_dir}"
             elif docker pull "${image}"; then
-              docker build --compress --cache-from="${image}" --tag="${image}" "${repo_dir}"
+              docker build ${{inputs.build_args}} --compress --cache-from="${image}" --tag="${image}" "${repo_dir}"
             else
-              docker build --compress --tag="${image}" "${repo_dir}"
+              docker build ${{inputs.build_args}} --compress --tag="${image}" "${repo_dir}"
             fi
             docker push "${image}"
           elif [ "${GITHUB_REF_TYPE}" = 'tag' ] && echo "${GITHUB_REF_NAME}" | grep -q '^[0-9]\+\.[0-9]\+\.[0-9]\+\(-[a-z]\+\)\?$'; then
@@ -46,25 +52,25 @@ jobs:
             cache_image="registry.cmctech.pro/${GITHUB_REPOSITORY}:${cache_tag}"
             image="registry.cmctech.pro/${GITHUB_REPOSITORY}:${GITHUB_REF_NAME}"
             if [ "${{inputs.cache}}" != 'true' ]; then
-              docker build --compress --pull --tag="${image}" "${repo_dir}"
+              docker build ${{inputs.build_args}} --compress --pull --tag="${image}" "${repo_dir}"
             elif docker pull "${cache_image}"; then
-              docker build --compress --cache-from="${cache_image}" --tag="${image}" "${repo_dir}"
+              docker build ${{inputs.build_args}} --compress --cache-from="${cache_image}" --tag="${image}" "${repo_dir}"
             else
-              docker build --compress --tag="${image}" "${repo_dir}"
+              docker build ${{inputs.build_args}} --compress --tag="${image}" "${repo_dir}"
             fi
             docker push "${image}"
           elif [ "${GITHUB_REF_TYPE}" = 'tag' ] && echo "${GITHUB_REF_NAME}" | grep -q '^test-[0-9a-f]\{7\}$'; then
             image="registry.cmctech.pro/${GITHUB_REPOSITORY}:${GITHUB_REF_NAME}"
             if [ "${{inputs.cache}}" != 'true' ]; then
-              docker build --compress --pull --tag="${image}" "${repo_dir}"
+              docker build ${{inputs.build_args}} --compress --pull --tag="${image}" "${repo_dir}"
             else
-              docker build --compress --tag="${image}" "${repo_dir}"
+              docker build ${{inputs.build_args}} --compress --tag="${image}" "${repo_dir}"
             fi
             docker push "${image}"
           else
             if [ "${{inputs.cache}}" != 'true' ]; then
-              docker build --compress --pull "${repo_dir}"
+              docker build ${{inputs.build_args}} --compress --pull "${repo_dir}"
             else
-              docker build --compress "${repo_dir}"
+              docker build ${{inputs.build_args}} --compress "${repo_dir}"
             fi
           fi

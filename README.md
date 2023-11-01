@@ -12,8 +12,8 @@
 name: Docker
 on: [push, workflow_dispatch]
 jobs:
-  docker:
-    uses: cmctec/ci-workflows/.github/workflows/docker.yaml@main
+  "docker":
+    uses: "cmctec/ci-workflows/.github/workflows/docker.yaml@main"
 ```
 
 ## Алгоритм работы
@@ -46,6 +46,11 @@ Workflow в обычном режиме запускается при git push.
 Собирается образ с тегом, соответствующим имени тега. Специальные настройки для
 кеширования не используются. Предполагается, что `1234abc` соответствует
 короткому хешу коммита, хотя это не проверяется.
+
+## Дополнительные аргументы
+
+В переменной `build_args` можно передать дополнительные аргументы для команды
+`docker build`.
 
 ## Отключение кеширования
 
